@@ -6,14 +6,6 @@ import (
 	"testing"
 )
 
-type spySleeper struct {
-	Calls int
-}
-
-func (s *spySleeper) Sleep() {
-	s.Calls++
-}
-
 type CountdownOperationsSpy struct {
 	Calls []string
 }
@@ -31,20 +23,17 @@ const sleepOperation = "sleep"
 const writeOperation = "write"
 
 func TestCountdown(t *testing.T) {
-	buffer := &bytes.Buffer{}
-	sleeper := &spySleeper{}
-	Countdown(buffer, sleeper)
+	t.Run("3 2 1 Go! sequence is printed", func(t *testing.T) {
+		buffer := &bytes.Buffer{}
+		Countdown(buffer, &CountdownOperationsSpy{})
 
-	want := "3\n2\n1\nGo!"
-	got := buffer.String()
+		want := "3\n2\n1\nGo!"
+		got := buffer.String()
 
-	if got != want {
-		t.Errorf("got %s want %s", got, want)
-	}
-
-	if sleeper.Calls != 4 {
-		t.Errorf("got %d want 4 sleeper calls", sleeper.Calls)
-	}
+		if got != want {
+			t.Errorf("got %s want %s", got, want)
+		}
+	})
 
 	t.Run("sleep is run before any write", func(t *testing.T) {
 		countdownOperations := &CountdownOperationsSpy{}
